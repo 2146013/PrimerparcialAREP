@@ -1,4 +1,6 @@
-package escuelaing.edu.AREP;
+package edu.escuelaing.AREP.HTTPServer;
+
+
 
 import java.net.*;
 import java.io.*;
@@ -9,18 +11,19 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-
-public class HttpServer {
-    private static HttpServer _instance = new HttpServer();
-    private HttpServer(){
+//solo pued haber una instancia de http server con singleton para que no haya mas instancias
+public class HTTPServer {
+    private static HTTPServer _instance = new HTTPServer();
+    private HTTPServer(){
 
     }
-    private static HttpServer getInstance(){
+    private static HTTPServer getInstance(){
         return _instance;
     }
     public static void main(String... args) throws IOException{
-        HttpServer.getInstance().startServer(args);
+        HTTPServer.getInstance().startServer(args);
     }
+
 
     public  void startServer(String[] args) throws IOException {
         int port = getPort();
@@ -48,12 +51,14 @@ public class HttpServer {
 
         serverSocket.close();
     }
+
     static int getPort() {
         if (System.getenv("PORT") != null) {
             return Integer.parseInt(System.getenv("PORT"));
         }
-        return 5000; //returns default port if heroku-port isn't set(i.e. on localhost)
+        return 35000; //returns default port if heroku-port isn't set(i.e. on localhost)
     }
+
     public  void processRequest(Socket clientSocket) throws IOException{
         PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
         BufferedReader in = new BufferedReader(

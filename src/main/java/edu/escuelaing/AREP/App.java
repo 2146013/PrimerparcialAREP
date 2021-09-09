@@ -1,4 +1,4 @@
-package escuelaing.edu.AREP;
+package edu.escuelaing.AREP;
 
 /**
  * Hello world!

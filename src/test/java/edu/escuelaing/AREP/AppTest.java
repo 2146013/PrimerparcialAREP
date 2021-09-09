@@ -1,4 +1,4 @@
-package escuelaing.edu.AREP;
+package edu.escuelaing.AREP;
 
 import static org.junit.Assert.assertTrue;
 
