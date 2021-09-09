@@ -3,9 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <title>Daniela Pachon</title>
-    <img src="https://hardzone.es/app/uploads-hardzone.es/2020/09/Inteligencia-Artificial.jpg" alt="Inteligencia Artificial">
+
 </head>
 <body>
-
+<form action="/calculadora.html" method="get">
+    <select id="dani" name="dani">
+        <option value="operacion">
+            please select operation
+        </option>
+        <option value="sin">
+            seno
+        </option>
+        <option value="cos">
+            coseno
+        </option>
+        <option value="tan">
+            tangente
+        </option>
+    </select>
+    <input id="val" name="numero">
+</form>
+<script>
+    const submiting = ( ) =>{
+        fetch(`http://localhost:35000/${document.getElementById(dani).value}?numero="${document.getElementById(val)}"&dani="${document.getElementById(dani)}"`)
+            .then(response=>response.json())
+    }
+</script>
 </body>
 </html>
