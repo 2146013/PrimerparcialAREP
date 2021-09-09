@@ -1,6 +1,6 @@
 package edu.escuelaing.AREP.HTTPServer;
 
-
+import com.sun.xml.internal.ws.api.ha.StickyFeature;
 
 import java.net.*;
 import java.io.*;
@@ -14,6 +14,8 @@ import java.util.List;
 //solo pued haber una instancia de http server con singleton para que no haya mas instancias
 public class HTTPServer {
     private static HTTPServer _instance = new HTTPServer();
+    private static String selectedFunction = "cos";
+    private static boolean numero1;
     private HTTPServer(){
 
     }
@@ -23,7 +25,6 @@ public class HTTPServer {
     public static void main(String... args) throws IOException{
         HTTPServer.getInstance().startServer(args);
     }
-
 
     public  void startServer(String[] args) throws IOException {
         int port = getPort();
@@ -52,6 +53,25 @@ public class HTTPServer {
         serverSocket.close();
     }
 
+    private static Double funcionPi (String numero){
+        Double pi= 1.0;
+        String[] listnum;
+        String number = numero;
+        Double ans=0.0;
+        if(numero.contains("π")) {
+            if(numero.length()>1){
+                listnum=numero.trim().split("π");
+                number = listnum[0];
+                pi=Math.PI;
+                ans=Double.valueOf(number)*pi;
+            }
+            else{
+                ans=Math.PI;
+            }
+
+        }
+        return ans;
+    }
     static int getPort() {
         if (System.getenv("PORT") != null) {
             return Integer.parseInt(System.getenv("PORT"));
@@ -59,11 +79,30 @@ public class HTTPServer {
         return 35000; //returns default port if heroku-port isn't set(i.e. on localhost)
     }
 
+
+
+    private static Double TrigCalculator (String numero1,String numero2){
+        System.out.println(numero1+" "+numero2);
+        Double funpi1= funcionPi(numero1);
+        Double funpi2= funcionPi(numero2);
+        Double answer=0.0;
+        if(selectedFunction.equals("sin")){
+            answer=Math.sin(funpi1/funpi2);
+        }
+        else if(selectedFunction.equals("cos")){
+            answer=Math.cos(funpi1/funpi2);
+        }
+        else if(selectedFunction.equals("tan")){
+            answer=Math.tan(funpi1/funpi2);
+        }
+        return answer;
+    }
+
     public  void processRequest(Socket clientSocket) throws IOException{
         PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
         BufferedReader in = new BufferedReader(
                 new InputStreamReader(clientSocket.getInputStream()));
-        String inputLine, outputLine;
+        String inputLine, outputLine="";
         String method="";
         String path = "";
         String version = "";
@@ -75,8 +114,47 @@ public class HTTPServer {
                 path = requestStrings[1];
                 version = requestStrings[2];
                 System.out.println("reques: "+method +" "+ path + " "+ version);
+                System.out.println(path);
+
             } else{
+
+                System.out.println("path"+path);
+
+                if(path.contains("/calculadora.html") && path.contains("number")){
+                    Double Answer = 0.0;
+                    outputLine="";
+                    ;switch (inputLine){
+                        case "fun:sin":
+                            selectedFunction = "sin";
+                            break;
+                        case "fun:cos":
+                            selectedFunction = "cos";
+                            break;
+                        case "fun:tan":
+                            selectedFunction = "tan";
+                            break;
+                        default:
+                            int pi = -1;
+                            int div = -1;
+                            String[] values = new String[0];
+                            if(inputLine.contains("/")){
+                                values= inputLine.trim().split("/");
+                                Answer = TrigCalculator(values[0],values[1]);
+
+                            }
+                            else{
+                                Answer = TrigCalculator(inputLine.trim());
+                            }
+
+
+
+                            outputLine = "Respuesta "+inputLine +" :" + Answer;
+
+
+                    }
+                }
                 System.out.println("header: "+inputLine);
+                //System.out.println("outpusadaskhdbaskdbhkasbdiasbdkjbaskdbaksdbaskdb: "+inputLine);
                 headers.add(inputLine);
             }
             System.out.println("Received: " + inputLine);
@@ -85,7 +163,7 @@ public class HTTPServer {
             }
         }
 
-
+        System.out.println(outputLine);
         String responseMessage = createResponse(path);
         out.println(responseMessage);
 
@@ -94,6 +172,22 @@ public class HTTPServer {
         in.close();
 
         clientSocket.close();
+    }
+    private static Double TrigCalculator (String num){
+        Double pi= funcionPi(num);
+        Double answer=0.0;
+        if(selectedFunction.equals("sin")){
+            answer=Math.sin(pi);
+        }
+        else if(selectedFunction.equals("cos")){
+            answer=Math.cos(pi);
+        }
+        else if(selectedFunction.equals("tan")){
+            System.out.println(pi);
+            System.out.println(Math.tan(pi));
+            answer=Math.tan(pi);
+        }
+        return answer;
     }
     public String createResponse(String path){
         String type = "text/html";
